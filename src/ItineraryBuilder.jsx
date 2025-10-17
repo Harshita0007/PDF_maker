@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generatePDF } from './utils/pdfGenerator';
+import { generatePDF } from '../src/utils/pdfGenerator';
 
 const ItineraryBuilder = () => {
     const [formData, setFormData] = useState({
@@ -46,11 +46,15 @@ const ItineraryBuilder = () => {
         ],
         flights: [
             { date: 'Thu 10 Jan\'24', airline: 'Fly Air India (AX-123)', route: 'From Delhi (DEL) To Singapore (SIN)' },
+            { date: 'Thu 10 Jan\'24', airline: 'Fly Air India (AX-123)', route: 'From Delhi (DEL) To Singapore (SIN)' },
+            { date: 'Thu 10 Jan\'24', airline: 'Fly Air India (AX-123)', route: 'From Delhi (DEL) To Singapore (SIN)' },
             { date: 'Thu 10 Jan\'24', airline: 'Fly Air India (AX-123)', route: 'From Delhi (DEL) To Singapore (SIN)' }
         ],
         hotels: [
             { city: 'Singapore', checkIn: '24/02/2024', checkOut: '24/02/2024', nights: 2, hotelName: 'Super TownHouse Oak Vashi Formerly Blue Diamond' },
-            { city: 'Singapore', checkIn: '24/02/2024', checkOut: '24/02/2024', nights: 2, hotelName: 'Super TownHouse Oak Vashi Formerly Blue Diamond' }
+            { city: 'Singapore', checkIn: '24/02/2024', checkOut: '24/02/2024', nights: 2, hotelName: 'Super TownHouse Oak Vashi Formerly Blue Diamond' },
+            { city: 'Singapore', checkIn: '24/02/2024', checkOut: '24/02/2024', nights: 3, hotelName: 'Super TownHouse Oak Lonavala (Variant 1) Four Bedroom Villa' },
+            { city: 'Singapore', checkIn: '24/02/2024', checkOut: '24/02/2024', nights: 3, hotelName: 'Super TownHouse Oak Lonavala (Variant 1) Four Bedroom Villa' }
         ],
         importantNotes: [
             { point: 'Airlines Standard Policy', details: 'In Case Of Visa Rejection, Visa Fees Or Any After Non-Cancellable Component Cannot Be Reimbursed At Any Cost.' },
@@ -58,14 +62,21 @@ const ItineraryBuilder = () => {
         ],
         scopeOfService: [
             { service: 'Flight Tickets and Hotel Vouchers', details: 'Delivered 3 Days Post Full Payment' },
-            { service: 'Web Check-In', details: 'Boarding Pass Delivery Via Email/WhatsApp' }
+            { service: 'Web Check-In', details: 'Boarding Pass Delivery Via Email/WhatsApp' },
+            { service: 'Support', details: 'Chat Support - Response Time: 6 Hours' },
+            { service: 'Complimentary Support', details: 'Provided' },
+            { service: 'Trip Support', details: 'Response Time: 5 Minutes' }
         ],
         inclusionSummary: [
             { category: 'Flight', count: 2, details: 'All Flights Mentioned', status: 'Awaiting Confirmation' },
+            { category: 'Airport Tax', count: 2, details: 'View Singapore Outbound Training. Returns Outward Onward Economy Flight For Melbourne', status: 'Awaiting Confirmation' },
             { category: 'Hotel', count: 2, details: 'Hotel stays included', status: 'Included' }
         ],
         activities: [
-            { city: 'Rio De Janeiro', activity: 'Sydney Harbour Cruise & Taronga Zoo', type: 'Nature/Sightseeing', timeRequired: '2-3 Hours' }
+            { city: 'Rio De Janeiro', activity: 'Sydney Harbour Cruise & Taronga Zoo', type: 'Nature/Sightseeing', timeRequired: '2-3 Hours' },
+            { city: 'Rio De Janeiro', activity: 'Sydney Harbour Cruise & Taronga Zoo', type: 'Airlines/Standard', timeRequired: '2-3 Hours' },
+            { city: 'Rio De Janeiro', activity: 'Sydney Harbour Cruise & Taronga Zoo', type: 'Airlines/Standard', timeRequired: '2-3 Hours' },
+            { city: 'Rio De Janeiro', activity: 'Sydney Harbour Cruise & Taronga Zoo', type: 'Airlines/Standard', timeRequired: '2-3 Hours' }
         ],
         totalAmount: 900000,
         tcsCollected: false,
@@ -89,6 +100,18 @@ const ItineraryBuilder = () => {
         setFormData(prev => ({ ...prev, dailyActivities: newActivities }));
     };
 
+    const handleFlightChange = (flightIndex, field, value) => {
+        const newFlights = [...formData.flights];
+        newFlights[flightIndex][field] = value;
+        setFormData(prev => ({ ...prev, flights: newFlights }));
+    };
+
+    const handleHotelChange = (hotelIndex, field, value) => {
+        const newHotels = [...formData.hotels];
+        newHotels[hotelIndex][field] = value;
+        setFormData(prev => ({ ...prev, hotels: newHotels }));
+    };
+
     const addDay = () => {
         setFormData(prev => ({
             ...prev,
@@ -106,6 +129,41 @@ const ItineraryBuilder = () => {
         }));
     };
 
+    const removeDay = (dayIndex) => {
+        const newActivities = formData.dailyActivities.filter((_, index) => index !== dayIndex);
+        setFormData(prev => ({ ...prev, dailyActivities: newActivities }));
+    };
+
+    const addFlight = () => {
+        setFormData(prev => ({
+            ...prev,
+            flights: [
+                ...prev.flights,
+                { date: '', airline: '', route: '' }
+            ]
+        }));
+    };
+
+    const removeFlight = (flightIndex) => {
+        const newFlights = formData.flights.filter((_, index) => index !== flightIndex);
+        setFormData(prev => ({ ...prev, flights: newFlights }));
+    };
+
+    const addHotel = () => {
+        setFormData(prev => ({
+            ...prev,
+            hotels: [
+                ...prev.hotels,
+                { city: '', checkIn: '', checkOut: '', nights: 0, hotelName: '' }
+            ]
+        }));
+    };
+
+    const removeHotel = (hotelIndex) => {
+        const newHotels = formData.hotels.filter((_, index) => index !== hotelIndex);
+        setFormData(prev => ({ ...prev, hotels: newHotels }));
+    };
+
     const handleGeneratePDF = () => {
         generatePDF(formData);
     };
@@ -117,6 +175,7 @@ const ItineraryBuilder = () => {
                 <p>Create your perfect travel plan</p>
             </div>
 
+            {/* Trip Details Section */}
             <div className="section-card">
                 <h2 className="section-title">Trip Details</h2>
                 <div className="form-grid">
@@ -186,11 +245,19 @@ const ItineraryBuilder = () => {
                 </div>
             </div>
 
+            {/* Daily Activities Section */}
             <div className="section-card">
                 <h2 className="section-title">Daily Activities</h2>
                 {formData.dailyActivities.map((day, index) => (
                     <div key={index} className="day-card">
-                        <h3 className="day-title">Day {day.day}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 className="day-title">Day {day.day}</h3>
+                            {formData.dailyActivities.length > 1 && (
+                                <button onClick={() => removeDay(index)} className="btn btn-red">
+                                    Remove Day
+                                </button>
+                            )}
+                        </div>
                         <div className="form-grid">
                             <div className="form-group">
                                 <label className="form-label">Date</label>
@@ -245,6 +312,184 @@ const ItineraryBuilder = () => {
                 </button>
             </div>
 
+            {/* Flights Section */}
+            <div className="section-card">
+                <h2 className="section-title">Flights</h2>
+                {formData.flights.map((flight, index) => (
+                    <div key={index} className="day-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 className="day-title">Flight {index + 1}</h3>
+                            {formData.flights.length > 1 && (
+                                <button onClick={() => removeFlight(index)} className="btn btn-red">
+                                    Remove Flight
+                                </button>
+                            )}
+                        </div>
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label className="form-label">Date</label>
+                                <input
+                                    type="text"
+                                    value={flight.date}
+                                    onChange={(e) => handleFlightChange(index, 'date', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Airline</label>
+                                <input
+                                    type="text"
+                                    value={flight.airline}
+                                    onChange={(e) => handleFlightChange(index, 'airline', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Route</label>
+                                <input
+                                    type="text"
+                                    value={flight.route}
+                                    onChange={(e) => handleFlightChange(index, 'route', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                <button onClick={addFlight} className="btn btn-blue">
+                    Add Another Flight
+                </button>
+            </div>
+
+            {/* Hotels Section */}
+            <div className="section-card">
+                <h2 className="section-title">Hotels</h2>
+                {formData.hotels.map((hotel, index) => (
+                    <div key={index} className="day-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 className="day-title">Hotel {index + 1}</h3>
+                            {formData.hotels.length > 1 && (
+                                <button onClick={() => removeHotel(index)} className="btn btn-red">
+                                    Remove Hotel
+                                </button>
+                            )}
+                        </div>
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label className="form-label">City</label>
+                                <input
+                                    type="text"
+                                    value={hotel.city}
+                                    onChange={(e) => handleHotelChange(index, 'city', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Check In</label>
+                                <input
+                                    type="text"
+                                    value={hotel.checkIn}
+                                    onChange={(e) => handleHotelChange(index, 'checkIn', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Check Out</label>
+                                <input
+                                    type="text"
+                                    value={hotel.checkOut}
+                                    onChange={(e) => handleHotelChange(index, 'checkOut', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Nights</label>
+                                <input
+                                    type="number"
+                                    value={hotel.nights}
+                                    onChange={(e) => handleHotelChange(index, 'nights', parseInt(e.target.value))}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                                <label className="form-label">Hotel Name</label>
+                                <input
+                                    type="text"
+                                    value={hotel.hotelName}
+                                    onChange={(e) => handleHotelChange(index, 'hotelName', e.target.value)}
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                <button onClick={addHotel} className="btn btn-blue">
+                    Add Another Hotel
+                </button>
+            </div>
+
+            {/* Payment Details */}
+            <div className="section-card">
+                <h2 className="section-title">Payment Details</h2>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label className="form-label">Total Amount (₹)</label>
+                        <input
+                            type="number"
+                            value={formData.totalAmount}
+                            onChange={(e) => handleInputChange('totalAmount', parseInt(e.target.value))}
+                            className="form-input"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">TCS Collected</label>
+                        <select
+                            value={formData.tcsCollected}
+                            onChange={(e) => handleInputChange('tcsCollected', e.target.value === 'true')}
+                            className="form-input"
+                        >
+                            <option value="false">Not Collected</option>
+                            <option value="true">Collected</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {/* Visa Details */}
+            <div className="section-card">
+                <h2 className="section-title">Visa Details</h2>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label className="form-label">Visa Type</label>
+                        <input
+                            type="text"
+                            value={formData.visaType}
+                            onChange={(e) => handleInputChange('visaType', e.target.value)}
+                            className="form-input"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Validity</label>
+                        <input
+                            type="text"
+                            value={formData.visaValidity}
+                            onChange={(e) => handleInputChange('visaValidity', e.target.value)}
+                            className="form-input"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Processing Date</label>
+                        <input
+                            type="text"
+                            value={formData.visaProcessingDate}
+                            onChange={(e) => handleInputChange('visaProcessingDate', e.target.value)}
+                            className="form-input"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Generate PDF Button */}
             <div className="center-btn">
                 <button onClick={handleGeneratePDF} className="btn btn-purple">
                     Generate Itinerary PDF
